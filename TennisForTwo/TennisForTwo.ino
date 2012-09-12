@@ -140,38 +140,8 @@ void StreamPrint_progmem(Print &out,PGM_P format,...)
   uint8_t Lused = 0;
   uint8_t Rused = 0;
  
- const int leftButton = 15;     //pin 15 is being used as a digital input for the left button
+ const int leftButton = 16;     //pin 16 is being used as a digital input for the left button
 // String message;
- 
- /* 
- //FIXME Are these all AVR C specific variables?
- 
- //DataDiraction Ports
-  //Outputs:
-  DDRB = 255;
-  DDRD = 255;
-  
-  //Internal Pull-up resistors off
-  PORTB = 0;
-  PORTD = 0;
-  
-  //Inputs:
-  DDRC = 0;
-  PORTC = 0; // Pull-ups off.  We have our own external pull-ups anyway.
-  
-  
-  // ADC Setup
-  
-  PRR &=  ~(_BV(ICF1));  //Allow ADC to be powered up
-  
-  //ADC 3-5
-  
-  ADMUX = Server * 4;	 
-  
-  ADCSRA = 197  ;  // Enable ADC & start, prescale at 32
-
- */
-
  
 
 void setup()
@@ -309,14 +279,9 @@ void loop() // main game loop
       {
 
         PORTD = yp;
-        PORTB = xp;
+        outputPORTB( xp);
         
-        //Serial.print(xp);
-        //Serial.print(",");
-        //Serial.println(yp);
-       // message+= xp+","+yp;
-        //message+=":";
-        Serialprint("%d,%d:",xp,yp);
+        //Serialprint("%d,%d:",xp,yp);
         
         m++;
 
@@ -469,13 +434,9 @@ void loop() // main game loop
       {
 
         PORTD = 0; // Y-position
-        PORTB = m; // X-position
-        //Serial.print(m);
-        //Serial.print(",");
-        //Serial.println(0);
+        outputPORTB(m); // X-position
         
-        //message+= m+",0";
-        //message+=":";
+        
         //Serialprint("%d,%d:",m,0);
         
         m++;
@@ -488,12 +449,7 @@ void loop() // main game loop
       {
 
         PORTD = m; // Y-position
-        //Serial.print(127);
-        //Serial.print(",");
-        //Serial.println(m);
-        
-        //message+= "127,"+m;
-        //message+=":";
+
         //Serialprint("%d,%d:",127,m);
 
         m += 2;
@@ -503,39 +459,24 @@ void loop() // main game loop
       {
 
         PORTD = m; // Y-position
-        //Serial.print(127);
-        //Serial.print(",");
-        //Serial.println(m);
-        
-        //message+= "127,"+m;
-        //message+=":";
+  
         //Serialprint("%d,%d:",127,m);
         
         m -= 2;
       }
 
       PORTD = 0; // Y-position
-      PORTB = 127; //Redundant, but allows time for scope trace to catch up.
-        //Serial.print(127);
-        //Serial.print(",");
-        //Serial.println(0);
-        
-        //message+= "127,0";
-        //message+=":";
-       Serialprint("%d,%d:",127,0);
+      outputPORTB( B1111111); //Redundant, but allows time for scope trace to catch up.
+
+       //Serialprint("%d,%d:",127,0);
       
       m = 127;
       while(m < 255)
       {
 
-        PORTD = 0; // Y-position
-        PORTB = m; // X-position
-        //Serial.print(m);
-        //Serial.print(",");
-        //Serial.println(0);
-        
-        //message+= m+",0";
-        //message+=":";
+       PORTD = 0; // Y-position
+       outputPORTB(m); // X-position
+ 
         //Serialprint("%d,%d:",m,0);
         
         m++;
@@ -551,7 +492,7 @@ void loop() // main game loop
       k = 0;
       while(k < (4 * m * m))
       {
-       PORTB = xOldList[m];
+       outputPORTB(xOldList[m]);
        PORTD = yOldList[m];
         
         //Serialprint("%d,%d:",xOldList[m],yOldList[m]);
@@ -568,13 +509,7 @@ void loop() // main game loop
     // Write the point to the buffer
 
     PORTD = yp;
-    PORTB = xp;
-        //Serial.print(xp);
-        //Serial.print(",");
-        //Serial.println(yp);
-  
-        //message+= xp+","+yp;
-        //message+=":";
+    PoutputPORTB( xp );
 
     //Serialprint("%d,%d:",xp,yp);
   
@@ -598,15 +533,9 @@ void loop() // main game loop
     {
 
       PORTD = yp;
-      PORTB = xp;
-        //Serial.print(xp);
-        //Serial.print(",");
-        //Serial.println(yp);
-        
-       // message+= xp+","+yp;
-        //message+=":";
+      outputPORTB(xp);
 
-      Serialprint("%d,%d:",xp,yp);
+      //Serialprint("%d,%d:",xp,yp);
         
       m++;
 
@@ -629,8 +558,8 @@ void loop() // main game loop
 void outputPORTB(byte input)
 {
   PORTB = input & B00111111;
-  PORTC = input & B00000011;
-    
   
+  byte tempByte = input >> 6;
+  PORTC = tempByte & B00000011;
 }
 

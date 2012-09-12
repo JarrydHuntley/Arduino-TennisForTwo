@@ -176,6 +176,11 @@ void StreamPrint_progmem(Print &out,PGM_P format,...)
 
 void setup()
 {
+  //Set our DD Ports for output
+    DDRD = B11111110;
+    DDRB = B00111111;
+    DDRC = B00000011;
+  
   // Create trig look-up table to keep things snappy.
   // 64 steps, total range: near pi.  Maybe a little more. 
   
@@ -620,15 +625,12 @@ void loop() // main game loop
         Serial.println("ENDMESSAGES");
 }//end loop
 
-void sendMessage(String messageBody)
+
+void outputPORTB(byte input)
 {
+  PORTB = input & B00111111;
+  PORTC = input & B00000011;
+    
   
-  if(!messageBody.equals("ENDMESSAGES"))
-  {
-    Serial.print(messageBody);
-  }
-  else
-  {
-      Serial.println(messageBody);
-  }
 }
+

@@ -90,7 +90,7 @@ void StreamPrint_progmem(Print &out,PGM_P format,...)
   #define g 0.8   
   
   // TimeStep
-  #define ts 2.025 
+  #define ts 0.025 
 
   #define historyLength 7 
   
@@ -140,7 +140,9 @@ void StreamPrint_progmem(Print &out,PGM_P format,...)
   uint8_t Lused = 0;
   uint8_t Rused = 0;
  
- const int leftButton = 16;     //pin 16 is being used as a digital input for the left button
+ const int leftButton = 17;     //pin 16 is being used as a digital input for the left button
+ 
+ const int rightButton = 19;     //pin 16 is being used as a digital input for the left button
 // String message;
  
 
@@ -171,6 +173,7 @@ void setup()
   
   //FIXME
    pinMode(leftButton, INPUT);
+   pinMode(rightButton, INPUT);
 
 }
 
@@ -202,7 +205,7 @@ void loop() // main game loop
 
       if(Server)
       {
-        xOld = (float) 210;
+        xOld = (float) 230;
         VxOld = 0; // (float) -2*g; 
         ballside = 1;
         Rused = 0;
@@ -210,7 +213,7 @@ void loop() // main game loop
       }
       else
       {
-        xOld = (float) 45;
+        xOld = (float) 25;
         VxOld = 0; // (float) 2*g; 
         ballside = 0;
         Rused = 1;
@@ -259,8 +262,13 @@ void loop() // main game loop
     }
     */
     //FIXME
-    int tempL = analogRead(A0);
-    Langle = tempL >> 4;
+    int tempL = analogRead(A2);
+    //Langle = tempL >> 4;
+    Langle = 36;    
+    
+    int tempR = analogRead(A4);
+    //Rangle = tempR >> 4;
+    Rangle = 26;
     
     //FIXME: Add analog reads here
     
@@ -268,6 +276,7 @@ void loop() // main game loop
     {
 		//NOTE: if reset pin?  Nope. Controller button presses...?
       if(((PINC & 2U) == 0) || ((PINC & 32U) == 0)) NewBallDelay = 10000;
+      if((digitalRead(leftButton) == LOW) || (digitalRead(rightButton) == LOW)) NewBallDelay = 10000;
 
       NewBallDelay++;
 
@@ -376,7 +385,7 @@ void loop() // main game loop
 
       // Simple routine to detect button presses: works, if the presses are slow enough.
 
-      //if(xOld < 120)
+      if(xOld < 120)
       {
         //if((PINC & 2U) == 0)
         if(digitalRead(leftButton) == LOW)
@@ -386,15 +395,16 @@ void loop() // main game loop
             VxNew = 1.5 * g * costable[Langle];
             VyNew = g + 1.5 * g * sintable[Langle];
 
-            //Lused = 1;
+            Lused = 1;
             NewBall = 0;
 
           }
         }
       }
-      //else if(xOld > 134) // Ball on right side of screen
+      else if(xOld > 134) // Ball on right side of screen
       {
         if((PINC & 32U) == 0)
+        if(digitalRead(rightButton) == LOW)
         {
 
           if((Rused == 0) && (deadball == 0))
@@ -411,7 +421,7 @@ void loop() // main game loop
       }
 
     }
-    
+
     //Figure out which point we're going to draw. 
 
     xp = (int) floor(Xnew);
@@ -425,7 +435,7 @@ void loop() // main game loop
     k = 0;
     
     //while(k < 20) FIXME
-    while(k < 1)
+    while(k < 20)
     {
       k++;
 
@@ -509,7 +519,7 @@ void loop() // main game loop
     // Write the point to the buffer
 
     PORTD = yp;
-    PoutputPORTB( xp );
+    outputPORTB( xp );
 
     //Serialprint("%d,%d:",xp,yp);
   
@@ -551,7 +561,7 @@ void loop() // main game loop
 
 //delay(50);
 
-        Serial.println("ENDMESSAGES");
+        //Serial.println("ENDMESSAGES");
 }//end loop
 
 
